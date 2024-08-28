@@ -14,45 +14,45 @@ class _SignupState extends State<Signup> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  singup() async {
-    try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email.text,
-        password: password.text,
-      );
-      Get.offAll(Wrapper());
-    } on FirebaseAuthException catch (e) {
-      String message;
-      switch (e.code) {
-        case 'weak-password':
-          message = 'La contraseña es demasiado débil.';
-          break;
-        case 'email-already-in-use':
-          message = 'La cuenta ya existe para ese correo electrónico.';
-          break;
-        case 'invalid-email':
-          message = 'El correo electrónico es inválido.';
-          break;
-        default:
-          message =
-              'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.';
-      }
-      Get.snackbar(
-        'Error de registro',
-        message,
-      );
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.',
-      );
+  signUp() async {
+  try {
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email.text,
+      password: password.text,
+    );
+    Get.offAll(const Wrapper());
+  } on FirebaseAuthException catch (e) {
+    String message;
+    switch (e.code) {
+      case 'weak-password':
+        message = 'The password is too weak.';
+        break;
+      case 'email-already-in-use':
+        message = 'An account already exists for that email address.';
+        break;
+      case 'invalid-email':
+        message = 'The email address is invalid.';
+        break;
+      default:
+        message = 'An unexpected error occurred. Please try again.';
     }
+    Get.snackbar(
+      'Registration Error',
+      message,
+    );
+  } catch (e) {
+    Get.snackbar(
+      'Error',
+      'An unexpected error occurred. Please try again.',
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: AppBar(backgroundColor: Color(0xFF6A11CB),),
+       appBar: AppBar(backgroundColor: const Color(0xFF6A11CB),),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -111,7 +111,7 @@ class _SignupState extends State<Signup> {
                   ),
                   const SizedBox(height: 40),
                   ElevatedButton(
-                    onPressed: singup,
+                    onPressed: signUp,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 50, vertical: 15),

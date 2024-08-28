@@ -1,4 +1,7 @@
 import 'package:auth_app/forgot.dart';
+import 'package:auth_app/home.dart';
+import 'package:auth_app/otp.dart';
+import 'package:auth_app/phone.dart';
 import 'package:auth_app/signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,50 +18,66 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
 
-  void signIn() async {
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email.text,
-        password: password.text,
+ void signIn() async {
+  try {
+    UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email.text,
+      password: password.text,
+    );
+
+    if (userCredential.user != null && userCredential.user!.phoneNumber != null) {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: userCredential.user!.phoneNumber!,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await FirebaseAuth.instance.signInWithCredential(credential);
+          Get.offAll(const HomePage());
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          Get.snackbar('Error', 'Verification failed: ${e.message}');
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          Get.to(() => Otp(verificationId: verificationId));
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+        },
       );
-    } on FirebaseAuthException catch (e) {
-      String message;
-      print(e.code);
-      switch (e.code) {
-        case 'invalid-email':
-          message = 'El correo electrónico no es válido.';
-          break;
-        case 'user-disabled':
-          message = 'El usuario ha sido deshabilitado.';
-          break;
-        case 'user-not-found':
-          message = 'No se encontró un usuario con ese correo.';
-          break;
-        case 'invalid-credential':
-          message = 'La contraseña es o el correo es incorrecto.';
-          break;
-        default:
-          message = 'Ocurrió un error. Inténtalo nuevamente.';
-          break;
-      }
-      Get.snackbar(
-        'Error',
-        message,
-      );
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Ocurrió un error inesperado. Inténtalo nuevamente.',
-      );
+    } else {
+      Get.snackbar('Error', 'The user does not have a phone number associated.');
+      Get.to(() => const PhoneNumberScreen());
     }
+  } on FirebaseAuthException catch (e) {
+    String message;
+    print(e.code);
+    switch (e.code) {
+      case 'invalid-email':
+        message = 'The email address is invalid.';
+        break;
+      case 'user-disabled':
+        message = 'The user has been disabled.';
+        break;
+      case 'user-not-found':
+        message = 'No user found with that email.';
+        break;
+      case 'wrong-password':
+        message = 'The password is incorrect.';
+        break;
+      default:
+        message = 'An error occurred. Please try again.';
+        break;
+    }
+    Get.snackbar('Error', message);
+  } catch (e) {
+    Get.snackbar('Error', 'An unexpected error occurred. Please try again.');
   }
+}
+
 
   void resetPassword() {
-    Get.to(Forgot());
+    Get.to(const Forgot());
   }
 
   void register() {
-    Get.to(Signup());
+    Get.to(const Signup());
   }
 
   @override

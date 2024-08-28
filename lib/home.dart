@@ -1,5 +1,7 @@
+import 'package:auth_app/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,9 +13,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser;
 
-  signout() async {
+ signout() async {
+  try {
     await FirebaseAuth.instance.signOut();
+    Get.offAll(const LoginPage()); 
+  } catch (e) {
+    Get.snackbar(
+      "Error",
+      "Could not sign out. Please try again.",
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -37,28 +48,20 @@ class _HomePageState extends State<HomePage> {
             CircleAvatar(
               radius: 50,
               backgroundColor: Colors.deepPurple.shade200,
-              child: Icon(
+              child: const Icon(
                 Icons.person,
                 size: 50,
                 color: Colors.white,
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              user?.email ?? 'No Email',
-              style: TextStyle(
-                fontSize: 20,
-                color: Colors.deepPurple.shade700,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () => signout(),
               icon: const Icon(Icons.logout),
               label: const Text('Sign Out'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
+                backgroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 textStyle: const TextStyle(
                   fontSize: 18,

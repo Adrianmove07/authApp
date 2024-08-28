@@ -14,44 +14,42 @@ class _ForgotState extends State<Forgot> {
   TextEditingController email = TextEditingController();
 
   void reset() async {
-    try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email.text);
-      Get.snackbar(
-        'Correo enviado',
-        'Revisa tu bandeja de entrada para restablecer tu contraseña.',
-      );
-      Get.to(Wrapper());
-    } on FirebaseAuthException catch (e) {
-      String errorMessage;
+  try {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email.text);
+    Get.snackbar(
+      'Email sent',
+      'Check your inbox to reset your password.',
+    );
+    Get.to(const Wrapper());
+  } on FirebaseAuthException catch (e) {
+    String errorMessage;
 
-      switch (e.code) {
-        case 'invalid-email':
-          errorMessage = 'El correo electrónico no es válido.';
-          break;
-        case 'user-not-found':
-          errorMessage = 'No existe un usuario con este correo electrónico.';
-          break;
-        default:
-          errorMessage =
-              'Ocurrió un error inesperado. Por favor, inténtalo de nuevo.';
-      }
-
-      Get.snackbar(
-        'Error',
-        errorMessage,
-      );
-    } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Algo salió mal. Por favor, inténtalo de nuevo.',
-      );
+    switch (e.code) {
+      case 'invalid-email':
+        errorMessage = 'The email is invalid.';
+        break;
+      case 'user-not-found':
+        errorMessage = 'No user found for that email.';
+        break;
+      default:
+        errorMessage = 'An unexpected error occurred. Please try again.';
     }
-  }
 
+    Get.snackbar(
+      'Error',
+      errorMessage,
+    );
+  } catch (e) {
+    Get.snackbar(
+      'Error',
+      'Something went wrong. Please try again.',
+    );
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(backgroundColor: Color(0xFF6A11CB),),
+      appBar: AppBar(backgroundColor: const Color(0xFF6A11CB),),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
